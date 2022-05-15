@@ -1,25 +1,27 @@
-<script setup>
-
-</script>
 
 <template>
     <header class="header">
       <div class="container">
         <nav class="navbar ">
           <a href="#" class="navbar__logo">-_-</a>
-          <form class="navbar__form-inline">
-            <input  class="navbar__search"  placeholder="Поиск по городам">
-            <button class="navbar__btn" type="submit">искать</button>
-          </form>
+
+            <Search/>
+
         </nav>
       </div>
     </header>
 </template>
 
+<script>
+import Search from "./Search.vue"
+export default{
+      components: { Search }
+}
+</script>
+
+
+
 <style scoped>
-
-
-
 .header {
   background-color: rgb(245, 245, 245);
 }

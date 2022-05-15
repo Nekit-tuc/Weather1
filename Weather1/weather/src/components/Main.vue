@@ -1,14 +1,63 @@
+<template>
+    <div class="main">
+      <div class="container">
+        <div class="main__data">
+          <div class="main__block">
+            <div class="info">
+              <div class="info__city">{{ city }}</div>
+              <div class="info__description"> {{ description }}</div>
+
+            </div>
+
+            <div class="block">
+                <BlockWeath v-for='forecast in forecasts' :key="forecast" :time='forecast.time' :icon='forecast.icon'
+                :temp='forecast.temp'>
+              </BlockWeath>
+
+            </div>
+            <div class="details">
+              <div class="details__row">
+                <div class="details__item">
+                  <div class="details__name">Ощущается как:</div>
+                  <div class="details__value"> {{ feels_like }}° </div>
+                </div>
+                <div class="details__item">
+                  <div class="details__name">Давление:</div>
+                  <div class="details__value">{{pressure}} мм.рт.</div>
+                </div>
+              </div>
+              <div class="details__row">
+                <div class="details__item">
+                  <div class="details__name">Влажность:</div>
+                  <div class="details__value">{{ humidity }}%</div>
+                </div>
+                <div class="details__item">
+                  <div class="details__name">Ветер:</div>
+                  <div class="details__value">5м/с</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</template>
+
 <script >
 import BlockWeath from "./BlockWeath.vue"
 export default{
+  props:['lat' , 'lon'],
     data() {
         return {
-            urlWeather: "https://api.openweathermap.org/data/2.5/forecast?q=Kyiv&appid=0d0ad9d5450fd92b19583dc4dd1801bc&lang=ru&units=metric",
+            // urlWeather: "https://api.openweathermap.org/data/2.5/forecast?q=&appid=0d0ad9d5450fd92b19583dc4dd1801bc&lang=ru&units=metric",
             dataWeather: "",
             forecasts: [],
             temperatureUnit: "˚",
             errors: [],
             dt_txt: "",
+            lat1: '50.584981',
+            lon1: '30.235748',
+            cyty2: "Kyiv",
             city: "",
             description: "",
             icon: "",
@@ -20,14 +69,18 @@ export default{
     async mounted() {
         await this.getWeather();
         this.forecasts = await this.getRenderForecast();
-        console.log(this.forecasts);
     },
     methods: {
+        latAdd(){
+          this.lat1 = lat
+          this.lon1 = lon
+          console.log(lon)
+        },
         async getWeather() {
             try {
-                const response = await fetch(this.urlWeather);
+                const response = await fetch("https://api.openweathermap.org/data/2.5/forecast?lat="+this.lat1+"&lon="+this.lon1+"&appid=0d0ad9d5450fd92b19583dc4dd1801bc&lang=ru&units=metric");
                 this.dataWeather = await response.json();
-                console.log(this.dataWeather);
+                console.log(this.dataWeather)
                 this.city = this.dataWeather.city.name;
                 this.description = this.dataWeather.list["0"]["weather"]["0"]["description"];
                 this.dt_txt = this.getHoursString(this.dataWeather.list["0"]["dt_txt"]);
@@ -44,7 +97,6 @@ export default{
             let forecastsD = [];
             for (let i = 0; i < 6; i++) {
                 let item = this.dataWeather.list[i];
-                console.log(item);
                 let icon = item.weather[0].icon;
                 let temp = Math.round(item.main.temp);
                 let time = (i == 0 ? "Сейчас" : this.getHoursString(item.dt_txt));
@@ -77,51 +129,6 @@ export default{
 }
 
 </script>
-
-<template>
-    <div class="main">
-      <div class="container">
-        <div class="main__data">
-          <div class="main__block">
-            <div class="info">
-              <div class="info__city">{{ city }}</div>
-              <div class="info__description"> {{ description }}</div>
-
-            </div>
-
-            <div class="block">
-                <BlockWeath v-for='forecast in forecasts' :key="forecast" v-bind:time='forecast.time' v-bind:icon='forecast.icon'
-                v-bind:temp='forecast.temp'>
-              </BlockWeath>
-
-            </div>
-            <div class="details">
-              <div class="details__row">
-                <div class="details__item">
-                  <div class="details__name">Ощущается как:</div>
-                  <div class="details__value"> {{ feels_like }}° </div>
-                </div>
-                <div class="details__item">
-                  <div class="details__name">Давление:</div>
-                  <div class="details__value">{{pressure}} мм.рт.</div>
-                </div>
-              </div>
-              <div class="details__row">
-                <div class="details__item">
-                  <div class="details__name">Влажность:</div>
-                  <div class="details__value">{{ humidity }}%</div>
-                </div>
-                <div class="details__item">
-                  <div class="details__name">Ветер:</div>
-                  <div class="details__value">5м/с</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-</template>
 
 <style scoped>
 
@@ -183,8 +190,4 @@ export default{
   font-size: 20px;
   padding-left: 15px;
 }
-
-
-
-
 </style>
